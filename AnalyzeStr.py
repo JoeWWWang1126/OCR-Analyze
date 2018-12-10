@@ -10,29 +10,23 @@ class AnalyzeStr:
 
     """
     这是分析字符串的文件，其中的函数被主程序导入并引用
+    #This file is to analyze the useful part, and used by the main program.
     """
     #------------------------------------------------------------------
     with open("totalname.xlsx.txt", "r",encoding='gbk') as f:
         rawdata = []
         result_dict = {}
-        # a=0
         for line in f.readlines():
             line = line.strip('\n')
             rawdata.append(line)
             sample_ = line.split(',')
-            # print(sample_)
             thelist = []
-            # a+=1
-            #
-            # print(a)
-            # print(sample_)
             if len(sample_) > 2:
                 for i in range(len(sample_) - 1):
                     thelist.append(sample_[i + 1])
             else:
                 thelist.append(sample_[1])
             result_dict[sample_[0]] = thelist
-        # print(result_dict)
     with open("supplyer.txt",'r',encoding='gbk') as z:
         supplyData=[]
         for line in z.readlines():
@@ -43,8 +37,6 @@ class AnalyzeStr:
         for line in p.readlines():
             line = line.strip('\n')
             depatureData.append(line)
-        # print(supplyData)
-            # print('result_dict:  '+str(result_dict))
     with open("forwarder.txt", 'r',encoding='gbk') as p:
         forwarderData = []
         for line in p.readlines():
@@ -60,6 +52,7 @@ class AnalyzeStr:
     #-------------------------------------------------------------------
     seadata=('XINGANG','TIANJIN','SCHENKER')
     #seadata为处理海运时使用，有以上字符的即为海运文件
+    #seadata is used while dealing with sea file.
     def getNum(self,string):
         num = re.sub(r'\D', "", string)
         return num
@@ -83,27 +76,16 @@ class AnalyzeStr:
         # newstring = re.sub(r"\s+", '', totalString)
         newstring = totalString
         getData=[]
-        # for i in self.rawdata:
-        #     matchObj = re.search(i, totalString, re.M | re.I)
-        #     if matchObj:
-        #         getData.append(i)
-        # return getData
-
-
         for i in self.result_dict:
-
             for x in self.result_dict[i]:
-                # print('x: '+x)
-
                 matchObj = re.search(x, newstring, re.M | re.I)
             if matchObj:
                 getData.append(i)
                 continue
-
-        # print(getData)
         return getData
     #checkTXT检查分析出来的所以字符，并筛选出其中有意义的部分
     def checkSupply(self,resultStr):
+        #checkSupply检查筛选出来的部分，并将这些字符串按供应商等类别划分
         a=[]
         b=0
         supplyer='none'
@@ -111,20 +93,12 @@ class AnalyzeStr:
         forwarder='none'
         sea = 'BEIJING'
         term='none'
-        # print(resultStr)
         for i in resultStr:
             a.append([i[0],i[1]])
             if i[2]!=[]:
                 for k in i[2]:
-
                     if k in self.supplyData:
-                        # print('supplyer:' + k)
                         supplyer=k
-                    # if k in self.depatureData:
-                    #     a[b].append(k)
-                    # else:
-                    #     print('no supplyer')
-
                     if k in self.depatureData:
                         depature=k
                     if k in self.forwarderData:
@@ -133,9 +107,6 @@ class AnalyzeStr:
                         sea = k
                     if k in self.termData:
                         term = k
-
-
-
             a[b].append(supplyer)
             a[b].append(depature)
             a[b].append(forwarder)
@@ -148,24 +119,11 @@ class AnalyzeStr:
             depature='none'
             sea = 'BEIJING'
             term = 'none'
-
-
-
-            # if i[2]!=[]:
-            #     for k in i[2]:
-            #         print(k)
-            #         if k in self.depatureData:
-            #             a[b].append(k)
-            #         else:
-            #             a[b].append('none')
-            # else:
-            #     a[b].append('none')
             b+=1
-        # print(a)
-
         return a
-    #checkSupply检查筛选出来的部分，并将这些字符串按供应商等类别划分
+    
     def write2excel(self,list,name):
+        #write2excel将结果写进Excel中，虽仍在使用中，但已不再维护，结果请全部参考写入数据库中的部分
         book = xlwt.Workbook(encoding='utf-8', style_compression=0)
         sheet = book.add_sheet('sheet1', cell_overwrite_ok=True)
         localtime = time.localtime()
@@ -176,18 +134,13 @@ class AnalyzeStr:
         style = xlwt.XFStyle()
         style.pattern = pattern
         a=1
-
         b=0
         g=1
         header=(u'NO.','write date','Inv Date','Customs Date','ETD','ETA',u'到厂日期',u'到厂时间','MAWB','HWB','Supplier','PCS','Weight','Chargeable weight','Amount','Currency','Forwarder','Depature','Destination','Terms of Delivery','Customs No','Customs duty','Customs VAT','F freight','Cost centre','Terms of payment','Shipping Model','Buyer','PR date','Other charge','AS','MARK')
         for i in header:
             sheet.write(0,b,i)
             b+=1
-        print(list)
-
-
         for i in list:
-            # sheet.write(a,0,i[0])
             repeat = False
             z=0
             judge = True
@@ -201,14 +154,10 @@ class AnalyzeStr:
                     judge=False
                     gap = rawnum2 - rawnum1
                     for z in range(gap - 1):
-                        # print(a + z + 1)
-                        # print('s' + str(rawnum1 + z + 1))
                         sheet.write(a + z + 1, 0, 's' + str(rawnum1 + z + 1))
                         sheet.write(a + z + 1, 1, printTime)
                 elif rawnum2 - rawnum1 == 0:
-                    # print('I am repeated')
                     repeat=True
-
                 else:
                     judge =True
             if repeat==False:
@@ -217,7 +166,6 @@ class AnalyzeStr:
                 sheet.write(a, 10, i[2])
                 sheet.write(a, 17, i[3])
                 sheet.write(a, 16, i[4])
-                # sheet.write(a,18,'BEIJING')
                 sheet.write(a, 17 + 8, '90')
                 if i[4] == 'HIASIANG' or i[5]=='TIANJIN' or i[5]=='XINGANG':
                     sheet.write(a, 17 + 9, 'SEA')
@@ -227,7 +175,6 @@ class AnalyzeStr:
                     sheet.write(a, 17 + 9, 'AIR')
                     sheet.write(a, 0, i[0])
                     sheet.write(a, 18, 'BEIJING')
-                # sheet.write(a,17+9,'AIR')
                 sheet.write(a, 17 + 14, 'By COMPUTER')
             else:
                 a=a-1
@@ -236,12 +183,10 @@ class AnalyzeStr:
                 a+=1
             else:
                 a += (z + 2)
-
-
-
         book.save(name+".xls")
-    #write2excel将结果写进Excel中，虽仍在使用中，但已不再维护，结果请全部参考写入数据库中的部分
+   
     def analyzeNum(self,rawstring):
+        #analyzeNum按找给与的正则表达式分析每一单的文件名，如果正确就返回运单号
         dsv_determin = self.dsv_(rawstring)
         expeditor_determine = self.expeditor_(rawstring)
         kwe_determine = self.kwe_(rawstring)
@@ -255,15 +200,8 @@ class AnalyzeStr:
         dgf_determine = self.dgf_(rawstring)
         schenker_determine = self.schenker_(rawstring)
         soonest_determine=self.soonest_(rawstring)
-        # if dsv_determin!='none':
-        #     print(dsv_determin)
-
-        # if re.findall(r"prg\d+",rawstring, re.I)!=[]:
-        #     return re.findall(r"prg\d+",rawstring, re.I)[0]
         if dsv_determin!='none':
             return dsv_determin
-        # elif re.findall(r"LOCL",rawstring, re.I)!=[]:
-        #     return re.findall(r"^\d+",rawstring, re.I)[0]
         elif expeditor_determine!='none':
             return expeditor_determine
         elif soonest_determine!='none':
@@ -283,28 +221,16 @@ class AnalyzeStr:
         elif ups_determine!='none':
             return ups_determine
         elif dhl_determine!='none':
-            # print('dhl')
             return dhl_determine
         elif hiasiang_determine!='none':
             return hiasiang_determine
         elif fedex_determine!='none':
             return fedex_determine
-        # elif re.findall(r"ZRH\d+",rawstring, re.I)!=[]:
-        #     return re.findall(r"ZRH\d+",rawstring)[0]
-        # elif re.findall(r"HKG\d+",rawstring, re.I)!=[]:
-        #     return re.findall(r"HKG\d+",rawstring)[0]
-        # elif re.findall(r"NUE\d+",rawstring, re.I)!=[]:
-        #     return re.findall(r"NUE\d+",rawstring)[0]
-        # elif re.findall(r"7[a-z][a-z]\d+",rawstring, re.I)!=[]:
-        #     return re.findall(r"7[a-z][a-z]\d+",rawstring, re.I)[0]
-        # elif self.dsv_(rawstring)!='none':
-        #     return
-        # elif re.findall(r"^\d+",rawstring, re.I)!=[]:
-        #     return re.findall(r"^\d+",rawstring, re.I)[0]
         else:
             return 'none'
-    #analyzeNum按找给与的正则表达式分析每一单的文件名，如果正确就返回运单号
+ 
     def anaTitle(self,rawi):
+        #anaTitle分析文件名，如果符合就返回真。
         dsv_determin = self.dsv_(rawi)
         expeditor_determine = self.expeditor_(rawi)
         kwe_determine = self.kwe_(rawi)
@@ -318,37 +244,8 @@ class AnalyzeStr:
         dgf_determine = self.dgf_(rawi)
         schenker_determine=self.schenker_(rawi)
         soonest_determine=self.soonest_(rawi)
-        # inv_determine = self.check_inv(rawi)
-        # contract_determine = self.check_contract(rawi)
-        #--------------------------------------------------
-        # if re.findall(r"prg\d+",rawi, re.I)!=[]:
-        #     return True
-        # elif re.findall(r"^450\d+",rawi, re.I)!=[]:
-        #     return False
-        # elif re.findall(r"^ISTCH\d+",rawi, re.I)!=[]:
-        #     return False
-        # elif re.findall(r"Inv",rawi, re.I)!=[]:
-        #     return False
-        # elif re.findall(r"inv",rawi, re.I)!=[]:
-        #     return False
-        # elif re.findall(r"LOCL",rawi, re.I)!=[]:
-        #     return True
-        # elif re.findall(r"AWB",rawi, re.I)!=[]:
-        #     return True
-        # elif re.findall(r"7[a-z][a-z]\d+",rawi, re.I)!=[]:
-        #     return True
-        # elif ( re.findall(r"^\d+",rawi, re.I )!=[] and len(re.findall(r"^\d+",rawi, re.I)[0])>5 and len(re.findall(r"^\d+",rawi, re.I)[0])<13):
-        #     # print('this--')
-        #     return True
-        #------------------------------------
         if dsv_determin!='none':
             return dsv_determin
-        # elif re.findall(r"LOCL",rawstring, re.I)!=[]:
-        #     return re.findall(r"^\d+",rawstring, re.I)[0]
-        # elif contract_determine=='none':
-        #     return True
-        # elif inv_determine =='none':
-        #     return True
         elif schenker_determine!='none':
             return True
         elif soonest_determine!='none':
@@ -373,13 +270,11 @@ class AnalyzeStr:
             return True
         elif fedex_determine!='none':
             return True
-        # elif re.findall(r"^\d+",rawi, re.I)!=[]:
-        #     return True
-
         else:
             return False
-    #anaTitle分析文件名，如果符合就返回真。
+   
     def checkforwarder(self,rawi):
+        #checkforwarder分析文件名，返回其运输商
         dsv_determin = self.dsv_(rawi)
         expeditor_determine = self.expeditor_(rawi)
         kwe_determine = self.kwe_(rawi)
@@ -395,8 +290,6 @@ class AnalyzeStr:
         soonest_determine=self.soonest_(rawi)
         if dsv_determin!='none':
             return 'DSV'
-        # elif re.findall(r"LOCL",rawstring, re.I)!=[]:
-        #     return re.findall(r"^\d+",rawstring, re.I)[0]
         elif schenker_determine!='none':
             return 'SCHENKER'
         elif soonest_determine!='none':
@@ -421,13 +314,9 @@ class AnalyzeStr:
             return 'HIASIANG'
         elif fedex_determine!='none':
             return 'FEDEX'
-        # elif re.findall(r"^\d+",rawi, re.I)!=[]:
-        #     return True
-
         else:
             return 'none'
-    #checkforwarder分析文件名，返回其运输商
-    #---------------------------------------------
+   
     def dsv_(self,test):
         if re.findall(r"prg\d+",test, re.I)!=[]:
             return re.findall(r"prg\d+",test, re.I)[0]
@@ -451,6 +340,7 @@ class AnalyzeStr:
             return re.findall(r"PDA\d+",test)[0]
         else:
             return 'none'
+        
     def expeditor_(self,test):
         if re.findall(r"^4913\d+",test, re.I)!=[]:
             return re.findall(r"^4913\d+",test, re.I)[0]
@@ -474,58 +364,47 @@ class AnalyzeStr:
         else:
             return 'none'
     def dhl_(self,test):
-        # if re.findall(r"7[a-z][a-z]\d+", test, re.I) != []:
-        #     return re.findall(r"7[a-z][a-z]\d+", test, re.I)[0]
         check=False
-        # print(test)
-
         if '.tif' in test:
             new_= test.split('.tif')[0]
-            # print(new_)
             if len(new_)==10:
                 check=True
-        # print(check)
-
         if (re.findall(r"^\d{10}", test, re.I) != []) and (re.findall(r"awb", test, re.I) != []) or (check==True) or (re.findall(r"^\d{10}[.]pdf", test, re.I) != []):
             return re.findall(r"^\d{10}", test, re.I)[0]
         else:
             return 'none'
+        
     def dgf_(self,test):
         if re.findall(r"7[a-z][a-z]\d{4}", test, re.I) != []:
              return re.findall(r"7[a-z][a-z]\d{4}", test, re.I)[0]
         else:
             return 'none'
+        
     def fedex_(self,test):
-        # check = False
-        # print('test',test)
-        #
-        # if '.pdf' in test:
-        #     new_ = test.split('.pdf')[0]
-        #     print(new_)
-        #     if len(new_) == 12:
-        #         check = True
-        # print(check)
         if re.findall(r"^\d{12}\D+", test, re.I) != [] :
             return re.findall(r"^\d{12}", test, re.I)[0]
         else:
             return 'none'
+        
     def hiasiang_(self,test):
         if re.findall(r"^7721\d{7}", test, re.I) != []:
             return re.findall(r"^7721\d+", test, re.I)[0]
         else:
             return 'none'
+        
     def agility_(self,test):
         if (re.findall(r"TH\d{8}", test, re.I) != []):
             return re.findall(r"TH\d{8}", test, re.I)[0]
         else:
             return 'none'
+        
     def mlg_(self,test):
         if (re.findall(r"MLG.\d{8}", test, re.I) != []):
             return re.findall(r"MLG.\d{8}", test, re.I)[0]
         else:
             return 'none'
+        
     def schenker_(self,test):
-        print(test)
         if (re.findall(r"USCHI\d{10}", test, re.I) != []):
             return re.findall(r"USCHI\d{10}", test, re.I)[0]
         else:
@@ -539,292 +418,46 @@ class AnalyzeStr:
     #-----------------------------------
 
     def contract(self,test):
+        #contract分析合同号以避开此类文件
         if (re.findall(r"^(450\d{7})", test, re.I) != []):
             return False
         else:
             return True
-    #contract分析合同号以避开此类文件
+        
     def accdb_(self,list,DBfile):
-        # conn = win32com.client.Dispatch(r"ADODB.Connection")
-        # DSN = 'PROVIDER = Microsoft.Jet.OLEDB.4.0;DATA SOURCE =大表录入程序.mdb'
-        # conn.Open(DSN)
-        # rs = win32com.client.Dispatch(r'ADODB.Recordset')
-        # rs_name = 'importList'
-        # rs.Open('[' + rs_name + ']', conn, 1, 3)
-
-        #-----------------------------------------------
-        #选择数据库--
-        # wildcard = u"Access 数据库 (*.accdb)|*.accdb" \
-        #
-        # dlg = wx.FileDialog(self, message=u"选择文件",
-        #                     defaultDir=os.getcwd(),
-        #                     defaultFile="",
-        #                     wildcard=wildcard,
-        #                     style=wx.OPEN  | wx.CHANGE_DIR)
-        # if dlg.ShowModal() == wx.ID_OK:
-        #     DBfile = dlg.GetPaths()
-        # dlg.Destroy()
-
-        #--------
-        # DBfile = r'e:\packingOCR\大表数据库.accdb'
+        #Connect the accdb to fill the dataset.
         conn = pyodbc.connect(
             r"Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=" + DBfile + ";Uid=;Pwd=;charset='utf-8';")
         cursor = conn.cursor()
         rs_name = 'importList'
-        #--------------------------------------
         localtime = time.localtime()
         printTime = str(localtime[0]) + r'/' + str(localtime[1]) + r'/' + str(localtime[2])
         a = 1
         b = 0
         g = 1
-        # for
         each_first={}
         posi=0
         for each in list:
             each_first[each[0]]=posi
             posi+=1
-        print(each_first)
         for raw_title in self.total_dir:
-
             if raw_title in each_first.keys():
                 i=list[each_first[raw_title]]
                 sentence3 = "VALUES ('" + raw_title + "','" + printTime + "','" + i[
                     1] + "','" + i[2] + "','" + i[4] + "','" + i[3] + "','" + i[6] + "','" + i[7] + "','" + i[
                                 8] + "','" + i[8]
                 if i[4] == 'HIASIANG' or i[5] == 'TIANJIN' or i[5] == 'XINGANG' or i[4]=='SCHENKER':
-                    # sheet.write(a, 17 + 9, 'SEA')
-                    # sheet.write(a, 0, i[0], style)
-                    # sheet.write(a, 18, 'TIANJIN')
                     sentence3 += "','" + "TIANJIN" + "','" + "90" + "','" + "SEA" + "','" + "BY_PC" + "')"
                 else:
-                    # sheet.write(a, 17 + 9, 'AIR')
-                    # sheet.write(a, 0, i[0])
-                    # sheet.write(a, 18, 'BEIJING')
                     sentence3 += "','" + "BEIJING" + "','" + "90" + "','" + "AIR" + "','" + "BY_PC" + "')"
                 sql3 = "Insert Into " + rs_name + "([No],[writeDate],[HWB],[Supplier],[Forwarder],[Departure],[TermsOfDelivery],[PCS],[Weight],[ChargeableWeight],[Destination],[TermsOfPayment],[ShippingModel],[MARK])" + sentence3
                 cursor.execute(sql3)
                 conn.commit()
-
-
-
-
             else:
-                print('?----------'+raw_title)
                 sentence1 = "VALUES ('" + raw_title + "','" + printTime + "')"
                 sql1 = "Insert Into " + rs_name + "([No],[writeDate])" + sentence1
-                print(sql1)
                 conn.execute(sql1)
                 conn.commit()
         print('Already Complete, Changes are made in your Access.')
-
         cursor.close()
         conn.close()
-
-
-
-            #         sentence4 = "VALUES ('" + 's' + str(rawnum1) + "','" + printTime + "','" + i[
-            #             1] + "','" + i[2] + "','" + i[4] + "','" + i[3]+ "','" + i[6]+ "','" + i[7]+ "','" + i[8]+ "','" + i[8]
-            #         if i[4] == 'HIASIANG' or i[5] == 'TIANJIN' or i[5] == 'XINGANG':
-            #             # sheet.write(a, 17 + 9, 'SEA')
-            #             # sheet.write(a, 0, i[0], style)
-            #             # sheet.write(a, 18, 'TIANJIN')
-            #             sentence4 += "','" + "TIANJIN" + "','" + "90" + "','" + "SEA" + "','" + "BY_PC" + "')"
-            #         else:
-            #             # sheet.write(a, 17 + 9, 'AIR')
-            #             # sheet.write(a, 0, i[0])
-            #             # sheet.write(a, 18, 'BEIJING')
-            #             sentence4 += "','" + "BEIJING" + "','" + "90" + "','" + "AIR" + "','" + "BY_PC" + "')"
-            #         sql4 = "Insert Into " + rs_name + "([No],[writeDate],[HWB],[Supplier],[Forwarder],[Departure],[TermsOfDelivery],[PCS],[Weight],[ChargeableWeight],[Destination],[TermsOfPayment],[ShippingModel],[MARK])" + sentence4
-            #         cursor.execute(sql4)
-            #         conn.commit()
-            # else:
-            #     # print(i)
-            #     rawS1 = i[0]
-            #     rawnum1 = int(re.sub(r'\D', '', rawS1))
-            #     sentence5 = "VALUES ('" + 's' + str(rawnum1) + "','" + printTime + "','" + i[
-            #         1] + "','" + i[2] + "','" + i[4] + "','" + i[3] + "','" + i[6]+ "','" + i[7]+ "','" + i[8]+ "','" + i[8]
-            #     if i[4] == 'HIASIANG' or i[5] == 'TIANJIN' or i[5] == 'XINGANG':
-            #         # sheet.write(a, 17 + 9, 'SEA')
-            #         # sheet.write(a, 0, i[0], style)
-            #         # sheet.write(a, 18, 'TIANJIN')
-            #         sentence5 += "','" + "TIANJIN" + "','" + "90" + "','" + "SEA" + "','" + "BY_PC" + "')"
-            #     else:
-            #         # sheet.write(a, 17 + 9, 'AIR')
-            #         # sheet.write(a, 0, i[0])
-            #         # sheet.write(a, 18, 'BEIJING')
-            #         sentence5 += "','" + "TIANJIN" + "','" + "90" + "','" + "SEA" + "','" + "BY_PC" + "')"
-            #     sql5 = "Insert Into " + rs_name + "([No],[writeDate],[HWB],[Supplier],[Forwarder],[Departure],[TermsOfDelivery],[PCS],[Weight],[ChargeableWeight],[Destination],[TermsOfPayment],[ShippingModel],[MARK])" + sentence5
-            #     cursor.execute(sql5)
-            #     conn.commit()
-
-            # if repeat==False:
-            #     # sheet.write(a, 1, printTime)
-            #     # sheet.write(a, 9, i[1])
-            #     # sheet.write(a, 10, i[2])
-            #     # sheet.write(a, 17, i[3])
-            #     # sheet.write(a, 16, i[4])
-            #     # # sheet.write(a,18,'BEIJING')
-            #     # sheet.write(a, 17 + 8, '90')
-            #     sentence2="VALUES ('" + 's' + str(rawnum1 + z + 1) + "','" + printTime + "','" + i[1] + "','" + i[2] + "','" + i[4] + "','" + i[3]
-            #     if i[4] == 'HIASIANG':
-            #         # sheet.write(a, 17 + 9, 'SEA')
-            #         # sheet.write(a, 0, i[0], style)
-            #         # sheet.write(a, 18, 'TIANJIN')
-            #         sentence2 += "','"+"TIANJIN"+"','"+"90"+"','"+"SEA"+"','"+"BY_PC"+"')"
-            #     else:
-            #         # sheet.write(a, 17 + 9, 'AIR')
-            #         # sheet.write(a, 0, i[0])
-            #         # sheet.write(a, 18, 'BEIJING')
-            #         sentence2 += "','" + "TIANJIN" + "','" + "90" + "','" + "SEA" + "','" + "BY_PC" + "')"
-            #     # sheet.write(a,17+9,'AIR')
-            #     # sheet.write(a, 17 + 14, 'By COMPUTER')
-            #     sql2 = "Insert Into " + rs_name+ "([No],[writeDate],[HWB],[Supplier],[Forwarder],[Departure],[Destination],[TermsOfPayment],[ShippingModel],[MARK])" + sentence2
-            #     conn.Execute(sql2)
-            # else:
-            #     a=a-1
-            # g += 1
-            # if judge == True:
-            #     a+=1
-            # else:
-            #     a += (z + 2)
-
-    #accdb_向数据库里写入并更新数据
-
-
-    # def adb_(self,list):
-    #     conn = win32com.client.Dispatch(r"ADODB.Connection")
-    #     DSN = 'PROVIDER = Microsoft.Jet.OLEDB.4.0;DATA SOURCE =大表录入程序.mdb'
-    #     conn.Open(DSN)
-    #     rs = win32com.client.Dispatch(r'ADODB.Recordset')
-    #     rs_name = 'importList'
-    #     rs.Open('[' + rs_name + ']', conn, 1, 3)
-    #
-    #
-    #
-    #     localtime = time.localtime()
-    #     printTime = str(localtime[0]) + r'/' + str(localtime[1]) + r'/' + str(localtime[2])
-    #     a = 1
-    #     b = 0
-    #     g = 1
-    #     for i in list:
-    #         repeat = False
-    #         z = 0
-    #         judge = True
-    #         if g != len(list):
-    #             rawS1 = i[0]
-    #             rawS2 = list[g][0]
-    #             rawnum2 = int(re.sub(r'\D', '', rawS2))
-    #             rawnum1 = int(re.sub(r'\D', '', rawS1))
-    #             if rawnum2 - rawnum1 != 1 and rawnum2 - rawnum1 != 0:
-    #                 judge=False
-    #                 gap = rawnum2 - rawnum1
-    #                 sentence3 = "VALUES ('" + 's' + str(rawnum1 ) + "','" + printTime + "','" + i[
-    #                     1] + "','" + i[2] + "','" + i[4] + "','" + i[3]
-    #                 if i[4] == 'HIASIANG' or i[5]=='TIANJIN' or i[5]=='XINGANG' :
-    #                     # sheet.write(a, 17 + 9, 'SEA')
-    #                     # sheet.write(a, 0, i[0], style)
-    #                     # sheet.write(a, 18, 'TIANJIN')
-    #                     sentence3 += "','" + "TIANJIN" + "','" + "90" + "','" + "SEA" + "','" + "BY_PC" + "')"
-    #                 else:
-    #                     # sheet.write(a, 17 + 9, 'AIR')
-    #                     # sheet.write(a, 0, i[0])
-    #                     # sheet.write(a, 18, 'BEIJING')
-    #                     sentence3 += "','" + "TIANJIN" + "','" + "90" + "','" + "SEA" + "','" + "BY_PC" + "')"
-    #                 sql3 = "Insert Into " + rs_name + "([No],[writeDate],[HWB],[Supplier],[Forwarder],[Departure],[Destination],[TermsOfPayment],[ShippingModel],[MARK])" + sentence3
-    #                 conn.Execute(sql3)
-    #                 for z in range(gap - 1):
-    #                     # print(a + z + 1)
-    #                     # print('s' + str(rawnum1 + z + 1))
-    #                     # sheet.write(a + z + 1, 0, 's' + str(rawnum1 + z + 1))
-    #                     # sheet.write(a + z + 1, 1, printTime)
-    #                     sentence2 = "VALUES ('" + 's' + str(rawnum1 + z + 1) + "','" + printTime + "','" + i[
-    #                         1] + "','" + i[2] + "','" + i[4] + "','" + i[3]
-    #
-    #                     # print('1')
-    #                     sentence1 = "VALUES ('" + 's' + str(rawnum1 + z + 1) + "','" + printTime +"')"
-    #                     sql1="Insert Into " + rs_name + "([No],[writeDate])" + sentence1
-    #                     conn.Execute(sql1)
-    #
-    #             else:
-    #                 sentence4 = "VALUES ('" + 's' + str(rawnum1 ) + "','" + printTime + "','" + i[
-    #                     1] + "','" + i[2] + "','" + i[4] + "','" + i[3]
-    #                 if i[4] == 'HIASIANG'or i[5]=='TIANJIN' or i[5]=='XINGANG':
-    #                     # sheet.write(a, 17 + 9, 'SEA')
-    #                     # sheet.write(a, 0, i[0], style)
-    #                     # sheet.write(a, 18, 'TIANJIN')
-    #                     sentence4 += "','" + "TIANJIN" + "','" + "90" + "','" + "SEA" + "','" + "BY_PC" + "')"
-    #                 else:
-    #                     # sheet.write(a, 17 + 9, 'AIR')
-    #                     # sheet.write(a, 0, i[0])
-    #                     # sheet.write(a, 18, 'BEIJING')
-    #                     sentence4 += "','" + "TIANJIN" + "','" + "90" + "','" + "SEA" + "','" + "BY_PC" + "')"
-    #                 sql4 = "Insert Into " + rs_name + "([No],[writeDate],[HWB],[Supplier],[Forwarder],[Departure],[Destination],[TermsOfPayment],[ShippingModel],[MARK])" + sentence4
-    #                 conn.Execute(sql4)
-    #
-    #         # if repeat==False:
-    #         #     # sheet.write(a, 1, printTime)
-    #         #     # sheet.write(a, 9, i[1])
-    #         #     # sheet.write(a, 10, i[2])
-    #         #     # sheet.write(a, 17, i[3])
-    #         #     # sheet.write(a, 16, i[4])
-    #         #     # # sheet.write(a,18,'BEIJING')
-    #         #     # sheet.write(a, 17 + 8, '90')
-    #         #     sentence2="VALUES ('" + 's' + str(rawnum1 + z + 1) + "','" + printTime + "','" + i[1] + "','" + i[2] + "','" + i[4] + "','" + i[3]
-    #         #     if i[4] == 'HIASIANG':
-    #         #         # sheet.write(a, 17 + 9, 'SEA')
-    #         #         # sheet.write(a, 0, i[0], style)
-    #         #         # sheet.write(a, 18, 'TIANJIN')
-    #         #         sentence2 += "','"+"TIANJIN"+"','"+"90"+"','"+"SEA"+"','"+"BY_PC"+"')"
-    #         #     else:
-    #         #         # sheet.write(a, 17 + 9, 'AIR')
-    #         #         # sheet.write(a, 0, i[0])
-    #         #         # sheet.write(a, 18, 'BEIJING')
-    #         #         sentence2 += "','" + "TIANJIN" + "','" + "90" + "','" + "SEA" + "','" + "BY_PC" + "')"
-    #         #     # sheet.write(a,17+9,'AIR')
-    #         #     # sheet.write(a, 17 + 14, 'By COMPUTER')
-    #         #     sql2 = "Insert Into " + rs_name+ "([No],[writeDate],[HWB],[Supplier],[Forwarder],[Departure],[Destination],[TermsOfPayment],[ShippingModel],[MARK])" + sentence2
-    #         #     conn.Execute(sql2)
-    #         # else:
-    #         #     a=a-1
-    #         # g += 1
-    #         # if judge == True:
-    #         #     a+=1
-    #         # else:
-    #         #     a += (z + 2)
-    #     print('Already Complete')
-    #
-    #
-    #
-    #
-    #
-    #
-    #     conn.Close()
-    # if __name__ == '__main__':
-    #     a='hhh updated'
-    #     def contract(test):
-    #         if (re.findall(r"^(450\d{7})", test, re.I) != []):
-    #             return False
-    #         else:
-    #             return True
-    #     print(contract(a))
-# def check_inv(self,test):
-    #     if re.findall(r"inv", test, re.I) != []:
-    #         return 'none'
-    #     else:
-    #         return 'nice'
-    # def check_contract(self,test):
-    #     if re.findall(r"^450", test, re.I) != []:
-    #         return 'none'
-    #     else:
-    #         return 'nice'
-    # print(self.anaTitle('4506011173.PDF'))
-
-
-
-
-
-
-
-
-
-
