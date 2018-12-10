@@ -121,69 +121,6 @@ class AnalyzeStr:
             term = 'none'
             b+=1
         return a
-    
-    def write2excel(self,list,name):
-        #write2excel将结果写进Excel中，虽仍在使用中，但已不再维护，结果请全部参考写入数据库中的部分
-        book = xlwt.Workbook(encoding='utf-8', style_compression=0)
-        sheet = book.add_sheet('sheet1', cell_overwrite_ok=True)
-        localtime = time.localtime()
-        printTime=str(localtime[0])+r'/'+str(localtime[1])+r'/'+str(localtime[2])
-        pattern = xlwt.Pattern()
-        pattern.pattern = xlwt.Pattern.SOLID_PATTERN
-        pattern.pattern_fore_colour = 4
-        style = xlwt.XFStyle()
-        style.pattern = pattern
-        a=1
-        b=0
-        g=1
-        header=(u'NO.','write date','Inv Date','Customs Date','ETD','ETA',u'到厂日期',u'到厂时间','MAWB','HWB','Supplier','PCS','Weight','Chargeable weight','Amount','Currency','Forwarder','Depature','Destination','Terms of Delivery','Customs No','Customs duty','Customs VAT','F freight','Cost centre','Terms of payment','Shipping Model','Buyer','PR date','Other charge','AS','MARK')
-        for i in header:
-            sheet.write(0,b,i)
-            b+=1
-        for i in list:
-            repeat = False
-            z=0
-            judge = True
-            if g!=len(list):
-                rawS1 = i[0]
-                rawS2 = list[g][0]
-                rawnum2 = int(re.sub(r'\D', '', rawS2))
-                rawnum1 = int(re.sub(r'\D', '', rawS1))
-
-                if rawnum2 - rawnum1 != 1 and rawnum2 - rawnum1 != 0:
-                    judge=False
-                    gap = rawnum2 - rawnum1
-                    for z in range(gap - 1):
-                        sheet.write(a + z + 1, 0, 's' + str(rawnum1 + z + 1))
-                        sheet.write(a + z + 1, 1, printTime)
-                elif rawnum2 - rawnum1 == 0:
-                    repeat=True
-                else:
-                    judge =True
-            if repeat==False:
-                sheet.write(a, 1, printTime)
-                sheet.write(a, 9, i[1])
-                sheet.write(a, 10, i[2])
-                sheet.write(a, 17, i[3])
-                sheet.write(a, 16, i[4])
-                sheet.write(a, 17 + 8, '90')
-                if i[4] == 'HIASIANG' or i[5]=='TIANJIN' or i[5]=='XINGANG':
-                    sheet.write(a, 17 + 9, 'SEA')
-                    sheet.write(a, 0, i[0], style)
-                    sheet.write(a, 18, 'TIANJIN')
-                else:
-                    sheet.write(a, 17 + 9, 'AIR')
-                    sheet.write(a, 0, i[0])
-                    sheet.write(a, 18, 'BEIJING')
-                sheet.write(a, 17 + 14, 'By COMPUTER')
-            else:
-                a=a-1
-            g += 1
-            if judge == True:
-                a+=1
-            else:
-                a += (z + 2)
-        book.save(name+".xls")
    
     def analyzeNum(self,rawstring):
         #analyzeNum按找给与的正则表达式分析每一单的文件名，如果正确就返回运单号
