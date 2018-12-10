@@ -1,0 +1,7 @@
+EXW
+FOB 
+CIP
+FCA
+DAP
+DDU
+CIF 
