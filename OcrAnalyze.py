@@ -158,7 +158,6 @@ class showFrame(FrameWork.MyFrame1,analyzeStr.AnalyzeStr):
         nowtitle = str(nowtime_.tm_mon) + "." + str(nowtime_.tm_mday) + "_" + str(nowtime_.tm_hour) + "." + str(
             nowtime_.tm_min)
         excelname = 'import list '+nowtitle+'.xls'
-        self.write2excel(the_end_list,excelname)
         self.accdb_(the_end_list,self.DBfile)
 
     def pdf_ocr(self):
