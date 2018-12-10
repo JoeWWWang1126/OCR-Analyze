@@ -162,6 +162,7 @@ class showFrame(FrameWork.MyFrame1,analyzeStr.AnalyzeStr):
         self.accdb_(the_end_list,self.DBfile)
 
     def pdf_ocr(self):
+        #OCR the PDF files.
         self.pdfstring = ''
         self.pdflist=[]
         termlist = ['EXW', 'CIP', 'CIF', 'FCA', 'FOB', 'DDU', 'DAP']
@@ -210,7 +211,6 @@ class showFrame(FrameWork.MyFrame1,analyzeStr.AnalyzeStr):
                         s_number = s_tr
                         break
                 invres =(pdf2jpg.convert_pdf2jpg(inputpath, outputpath, pages="ALL"))
-
                 invadd = invres[0]['output_jpgfiles']
                 count_ += 1
                 hwb_real = self.analyzeNum(self.eachPerName[a])
@@ -250,6 +250,7 @@ class showFrame(FrameWork.MyFrame1,analyzeStr.AnalyzeStr):
             pass
 
     def tif_ocr(self):
+        #OCR the TIF files.
         a=0
         b=[]
         s_num='none-s'
